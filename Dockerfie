@@ -1,0 +1,24 @@
+FROM openjdk:11-jre-slim
+
+ENV KAFKA_VERSION=2.8.1
+ENV SCALA_VERSION=2.13
+
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt
+
+RUN wget https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz \
+    && tar -xzf kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz \
+    && mv kafka_${SCALA_VERSION}-${KAFKA_VERSION} kafka \
+    && rm kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz
+
+WORKDIR /opt/kafka
+
+RUN mkdir -p /opt/kafka/data
+
+COPY start-kafka.sh /usr/bin/start-kafka.sh
+RUN chmod +x /usr/bin/start-kafka.sh
+
+EXPOSE 9092 9192
+
+CMD ["start-kafka.sh"]
